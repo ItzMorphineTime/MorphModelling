@@ -1,0 +1,149 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../../vendor/shadcn-tailwind-4.13.0.css";
+
+/*
+ * Design tokens
+ * Colours follow the Morph Brand System V2.1 colour guidelines. Components use
+ * the semantic --ui-* tokens below, never the raw primitives.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Brand primitives: alias targets only. */
+  --morph-black-950: #0a0a0a;
+  --morph-red-600: #c51622;
+  --morph-white-1000: #ffffff;
+  --morph-gold-500: #f2b705;
+  --morph-neutral-50: #f7f7f5;
+  --morph-neutral-600: #6c6c6c;
+  --morph-neutral-200: #d4d4d4;
+
+  /* Brand semantic tokens. */
+  --color-logo-black: var(--morph-black-950);
+  --color-logo-signal-red: var(--morph-red-600);
+  --color-logo-studio-white: var(--morph-white-1000);
+  --color-logo-pivot-gold: var(--morph-gold-500);
+  --color-surface-canvas: var(--morph-neutral-50);
+  --color-text-muted: var(--morph-neutral-600);
+  --color-border-default: var(--morph-neutral-200);
+
+  /*
+   * Editor neutrals: Studio White mixed into Morph Black. The step number is
+   * the percentage of white, so the brand's Muted (40) and Border (82) sit on
+   * the same ramp. Keep in sync with src/lib/morph/theme.ts.
+   */
+  --ui-gray-0: var(--color-logo-black);
+  --ui-gray-3: #111111;
+  --ui-gray-5: #161616;
+  --ui-gray-7: #1b1b1b;
+  --ui-gray-9: #202020;
+  --ui-gray-12: #272727;
+  --ui-gray-15: #2f2f2f;
+  --ui-gray-18: #363636;
+  --ui-gray-22: #404040;
+  --ui-gray-82: #d4d4d4;
+
+  /* Text. Muted and above meet WCAG AA on every editor surface. */
+  --ui-text: var(--color-logo-studio-white);
+  --ui-text-body: var(--ui-gray-82);
+  --ui-text-secondary: #a9a9a9;
+  --ui-text-muted: #919191;
+  --ui-text-faint: var(--color-text-muted);
+
+  /* Signal Red carries motion and change: active tools, tabs and controls. */
+  --ui-accent: var(--color-logo-signal-red);
+  --ui-accent-soft: color-mix(in srgb, var(--ui-accent) 22%, transparent);
+  /* Pivot Gold marks the decisive point, once per layout: the selection. */
+  --ui-highlight: var(--color-logo-pivot-gold);
+  --ui-focus: var(--color-logo-studio-white);
+  --ui-viewport: var(--ui-gray-9);
+
+  /* Montserrat is the brand typeface; dense controls use a compact UI face. */
+  --font-display: "Montserrat Variable", Montserrat, Arial, sans-serif;
+
+  /* shadcn/ui theme variables, mapped onto the tokens above. */
+  --background: var(--ui-gray-0);
+  --foreground: var(--ui-text);
+  --card: var(--ui-gray-3);
+  --card-foreground: var(--ui-text);
+  --popover: var(--ui-gray-5);
+  --popover-foreground: var(--ui-text);
+  --primary: var(--ui-accent);
+  --primary-foreground: var(--ui-text);
+  --secondary: var(--ui-gray-9);
+  --secondary-foreground: var(--ui-text);
+  --muted: var(--ui-gray-9);
+  --muted-foreground: var(--ui-text-muted);
+  --accent: var(--ui-gray-12);
+  --accent-foreground: var(--ui-text);
+  --destructive: color-mix(
+    in srgb,
+    var(--color-logo-signal-red) 72%,
+    var(--color-logo-studio-white)
+  );
+  --border: var(--ui-gray-12);
+  --input: var(--ui-gray-15);
+  --ring: var(--ui-focus);
+  --radius: 0.4rem;
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: 0.2rem;
+  --radius-md: 0.35rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.7rem;
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+@layer base {
+  /* Tailwind v4 borders default to currentColor; shadcn/ui expects the theme border. */
+  * {
+    border-color: var(--border);
+  }
+}
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ui-gray-18) var(--ui-gray-5);
+}
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 3px;
+}
+svg {
+  flex-shrink: 0;
+}

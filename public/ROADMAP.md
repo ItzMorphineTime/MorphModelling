@@ -59,16 +59,16 @@ These are prioritized milestones, not dated delivery commitments. Each milestone
 
 ## Architecture
 
-- React / TypeScript interface using the supplied accessible UI primitives.
+- React / TypeScript interface built with Vite, using accessible Radix-based UI primitives.
 - Three.js 0.186 renderer, controls, raycasting and import/export adapters.
-- `lib/morph/model.ts`: plain serializable polygon meshes with per-corner UVs and geometry operations.
-- `lib/morph/viewport.ts`: rendering, camera navigation, picking and transform gestures.
-- `lib/morph/files.ts`: format adapters, project validation, local recovery and texture handling.
-- `components/morph/editor.tsx`: scene transactions, history and UI orchestration.
-- `components/morph/uv-editor.tsx`: UV editing surface.
-- `tests/model.test.ts`: topology invariants, triangulation orientation, UV preservation and file round trips.
+- `src/lib/morph/model.ts`: plain serializable polygon meshes with per-corner UVs and geometry operations.
+- `src/lib/morph/viewport.ts`: rendering, camera navigation, picking and transform gestures.
+- `src/lib/morph/files.ts`: format adapters, project validation, local recovery and texture handling.
+- `src/components/morph/editor.tsx`: scene transactions, history and UI orchestration.
+- `src/components/morph/uv-editor.tsx`: UV editing surface.
+- `tests/`: topology invariants, triangulation orientation, UV preservation and file round trips.
 
-Projects and imported images are processed in the browser. They are not uploaded to an application server. The hosting service provides the application files.
+Projects and imported images are processed in the browser. They are not uploaded to an application server. The application is a static site; the host (for example GitHub Pages) only serves its files.
 
 ## Next engineering tasks
 

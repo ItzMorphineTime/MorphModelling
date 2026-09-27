@@ -1,0 +1,8 @@
+dist
+package-lock.json
+# Vendored third-party code stays verbatim.
+src/components/ui
+vendor
+# Hand-written docs and vector artwork.
+*.md
+*.svg

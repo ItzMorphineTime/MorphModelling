@@ -1,16 +1,114 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {Vector3} from 'three';
-import {bevel,clone,extrude,geometry,inset,normal,packUV,primitive,sliceMesh,starterProject,subdivide,validateProject,type MeshData} from '../lib/morph/model';
-import {objText,parseOBJ} from '../lib/morph/files';
-function topology(m:MeshData,closed=true){const edge=new Map<string,{count:number;sum:number}>();assert.equal(m.uvs.length,m.faces.length);m.faces.forEach((f,i)=>{assert.ok(f.length>=3);assert.equal(new Set(f).size,f.length);assert.equal(f.length,m.uvs[i].length);f.forEach((a,j)=>{assert.ok(m.vertices[a].every(Number.isFinite));assert.ok(m.uvs[i][j].every(Number.isFinite));const b=f[(j+1)%f.length],key=[a,b].sort((a,b)=>a-b).join(':'),val=edge.get(key)??{count:0,sum:0};val.count++;val.sum+=a<b?1:-1;edge.set(key,val);});});if(closed)edge.forEach((v,k)=>{assert.equal(v.count,2,'manifold edge '+k);assert.equal(v.sum,0,'winding edge '+k);});const g=geometry(m),pos=g.getAttribute('position');for(let t=0;t<pos.count/3;t++){const p=[0,1,2].map(j=>new Vector3().fromBufferAttribute(pos,t*3+j)),n=p[1].sub(p[0]).cross(p[2].sub(p[0])),faceNormal=normal(m,m.faces[g.userData.faceMap[t]]);assert.ok(n.dot(faceNormal)>=-1e-6,'consistent triangulation');}}
-for(const name of ['Cube','Sphere','Cylinder','Cone','Torus','Icosphere'])test(name+' has closed oriented topology and UVs',()=>topology(primitive(name)));
-test('region extrusion keeps manifold adjacency and moves the top',()=>{const m=primitive('Cube'),ids=extrude(m,[5],.5);assert.equal(ids.length,1);assert.equal(m.faces.length,10);assert.equal(Math.max(...m.vertices.map(v=>v[1])),1.5);topology(m);});
-test('connected extrusion creates only boundary walls',()=>{const m=primitive('Cube');extrude(m,[3,5],.3);assert.equal(m.faces.length,12);topology(m);});
-test('inset preserves topology and UV corners',()=>{const m=primitive('Cube');inset(m,[5],.2);assert.equal(m.faces.length,10);topology(m);});
-test('bevel closes face strips and corners',()=>{const m=bevel(primitive('Cube'),.15);assert.equal(m.faces.length,26);assert.equal(m.vertices.length,24);topology(m);});
-test('subdivision shares edge midpoints',()=>{const m=subdivide(primitive('Cube'));assert.equal(m.faces.length,24);assert.equal(m.vertices.length,26);topology(m);});
-test('loop slice shares intersection vertices',()=>{const m=sliceMesh(primitive('Cube'),1,0);assert.equal(m.faces.length,10);assert.equal(m.vertices.length,12);topology(m);});
-test('UV packing stays inside tile',()=>assert.ok(packUV(primitive('Cube')).uvs.flat().every(p=>p.every(v=>v>=0&&v<=1))));
-test('project serialization preserves topology and rejects invalid indices',()=>{const p=starterProject();assert.deepEqual(validateProject(JSON.parse(JSON.stringify(p))),p);const invalid=clone(p);invalid.objects[0].mesh.faces[0][0]=99999;assert.throws(()=>validateProject(invalid));});
-test('OBJ round trip retains all mesh faces, UVs and object names',()=>{const p=starterProject(),result=parseOBJ(objText(p));assert.equal(result.length,p.objects.length);result.forEach((o,i)=>{assert.equal(o.mesh.faces.length,p.objects[i].mesh.faces.length);assert.deepEqual(o.mesh.uvs,p.objects[i].mesh.uvs);topology(o.mesh);});});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { Vector3 } from "three";
+import {
+  bevel,
+  clone,
+  extrude,
+  geometry,
+  inset,
+  normal,
+  packUV,
+  primitive,
+  sliceMesh,
+  starterProject,
+  subdivide,
+  validateProject,
+  type MeshData,
+} from "../src/lib/morph/model";
+import { objText, parseOBJ } from "../src/lib/morph/files";
+function topology(m: MeshData, closed = true) {
+  const edge = new Map<string, { count: number; sum: number }>();
+  assert.equal(m.uvs.length, m.faces.length);
+  m.faces.forEach((f, i) => {
+    assert.ok(f.length >= 3);
+    assert.equal(new Set(f).size, f.length);
+    assert.equal(f.length, m.uvs[i].length);
+    f.forEach((a, j) => {
+      assert.ok(m.vertices[a].every(Number.isFinite));
+      assert.ok(m.uvs[i][j].every(Number.isFinite));
+      const b = f[(j + 1) % f.length],
+        key = [a, b].sort((a, b) => a - b).join(":"),
+        val = edge.get(key) ?? { count: 0, sum: 0 };
+      val.count++;
+      val.sum += a < b ? 1 : -1;
+      edge.set(key, val);
+    });
+  });
+  if (closed)
+    edge.forEach((v, k) => {
+      assert.equal(v.count, 2, "manifold edge " + k);
+      assert.equal(v.sum, 0, "winding edge " + k);
+    });
+  const g = geometry(m),
+    pos = g.getAttribute("position");
+  for (let t = 0; t < pos.count / 3; t++) {
+    const p = [0, 1, 2].map((j) => new Vector3().fromBufferAttribute(pos, t * 3 + j)),
+      n = p[1].sub(p[0]).cross(p[2].sub(p[0])),
+      faceNormal = normal(m, m.faces[g.userData.faceMap[t]]);
+    assert.ok(n.dot(faceNormal) >= -1e-6, "consistent triangulation");
+  }
+}
+for (const name of ["Cube", "Sphere", "Cylinder", "Cone", "Torus", "Icosphere"])
+  test(name + " has closed oriented topology and UVs", () => topology(primitive(name)));
+test("region extrusion keeps manifold adjacency and moves the top", () => {
+  const m = primitive("Cube"),
+    ids = extrude(m, [5], 0.5);
+  assert.equal(ids.length, 1);
+  assert.equal(m.faces.length, 10);
+  assert.equal(Math.max(...m.vertices.map((v) => v[1])), 1.5);
+  topology(m);
+});
+test("connected extrusion creates only boundary walls", () => {
+  const m = primitive("Cube");
+  extrude(m, [3, 5], 0.3);
+  assert.equal(m.faces.length, 12);
+  topology(m);
+});
+test("inset preserves topology and UV corners", () => {
+  const m = primitive("Cube");
+  inset(m, [5], 0.2);
+  assert.equal(m.faces.length, 10);
+  topology(m);
+});
+test("bevel closes face strips and corners", () => {
+  const m = bevel(primitive("Cube"), 0.15);
+  assert.equal(m.faces.length, 26);
+  assert.equal(m.vertices.length, 24);
+  topology(m);
+});
+test("subdivision shares edge midpoints", () => {
+  const m = subdivide(primitive("Cube"));
+  assert.equal(m.faces.length, 24);
+  assert.equal(m.vertices.length, 26);
+  topology(m);
+});
+test("loop slice shares intersection vertices", () => {
+  const m = sliceMesh(primitive("Cube"), 1, 0);
+  assert.equal(m.faces.length, 10);
+  assert.equal(m.vertices.length, 12);
+  topology(m);
+});
+test("UV packing stays inside tile", () =>
+  assert.ok(
+    packUV(primitive("Cube"))
+      .uvs.flat()
+      .every((p) => p.every((v) => v >= 0 && v <= 1)),
+  ));
+test("project serialization preserves topology and rejects invalid indices", () => {
+  const p = starterProject();
+  assert.deepEqual(validateProject(JSON.parse(JSON.stringify(p))), p);
+  const invalid = clone(p);
+  invalid.objects[0].mesh.faces[0][0] = 99999;
+  assert.throws(() => validateProject(invalid));
+});
+test("OBJ round trip retains all mesh faces, UVs and object names", () => {
+  const p = starterProject(),
+    result = parseOBJ(objText(p));
+  assert.equal(result.length, p.objects.length);
+  result.forEach((o, i) => {
+    assert.equal(o.mesh.faces.length, p.objects[i].mesh.faces.length);
+    assert.deepEqual(o.mesh.uvs, p.objects[i].mesh.uvs);
+    topology(o.mesh);
+  });
+});
